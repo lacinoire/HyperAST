@@ -286,7 +286,7 @@ fn read_repos() {
         let commit = repo.get(1).unwrap();
         let limit = 5;
         let query = hyper_ast_benchmark_smells::queries::assertion_roulette();
-        eprintln!("repo_name: {}, commit: {}, limit: {}, query: {}", repo_name, commit, limit, query);
+        eprintln!("repo_name: {}, commit: {}, limit: {}", repo_name, commit, limit);
         many(repo_name, commit, limit, &query);
     }
 }
