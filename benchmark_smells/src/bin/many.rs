@@ -218,6 +218,24 @@ fn many(repo_name: &str, commit: &str, limit: usize, query: &str) {
     eprintln!("TODO summary")
 }
 
+use std::error::Error;
+use std::fs::File;
+use std::path::Path;
+
+fn read_csv<P: AsRef<Path>>(filename: P) -> Result<Vec<csv::StringRecord>, Box<dyn Error>> {
+    println!("Reading file {:?}", filename.as_ref());
+    let mut rdr = csv::Reader::from_path(filename)?;
+
+    let mut out = vec![];
+    for result in rdr.records() {
+        let record = result?;
+        out.push(record.clone());
+        // println!("{:?}", record);
+    }
+
+    Ok(out)
+}
+
 // !!! query is currently incorrect but it is running :)
 #[test]
 fn conditional_test_logic() {
@@ -252,4 +270,23 @@ fn exeption_handling() {
     let query = format!("{} @root", query);
     println!("{}", query);
     many(repo_name, commit, limit, &query);
+}
+
+#[test]
+fn read_repos() {
+    let filename = "/Users/caro/Documents/Studies/Quentin/HyperAST/benchmark_smells/src/bin/repos.csv";
+    let x = read_csv(filename);
+    assert!(x.is_ok());
+
+    let repos = x.unwrap();
+    eprintln!("{:?}", repos);
+
+    for repo in repos {
+        let repo_name = repo.get(0).unwrap();
+        let commit = repo.get(1).unwrap();
+        let limit = 5;
+        let query = hyper_ast_benchmark_smells::queries::assertion_roulette();
+        eprintln!("repo_name: {}, commit: {}, limit: {}, query: {}", repo_name, commit, limit, query);
+        many(repo_name, commit, limit, &query);
+    }
 }
